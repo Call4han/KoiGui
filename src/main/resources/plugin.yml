@@ -2,3 +2,6 @@ name: Chapter46
 version: '${project.version}'
 main: me.callahandev.chapter46.Chapter46
 api-version: 1.18
+commands:
+  vault:
+    description: xdd
