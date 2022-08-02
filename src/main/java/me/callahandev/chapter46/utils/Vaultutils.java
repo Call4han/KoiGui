@@ -19,52 +19,76 @@ import java.util.logging.Logger;
 
 public class Vaultutils {
 
-    public static void storeItem(List<ItemStack> items, Player p){
+    public static void storeItems(List<ItemStack> items, Player p){
+
         PersistentDataContainer data = p.getPersistentDataContainer();
 
-        if (items.size()==0){
-            data.set(new NamespacedKey(Chapter46.getPlugin(),"vault"), PersistentDataType.STRING,"");
+        if (items.size() == 0){
+            data.set(new NamespacedKey(Chapter46.getPlugin(), "vault"), PersistentDataType.STRING, "");
+        }else{
 
-        }else {
             try{
+
                 ByteArrayOutputStream io = new ByteArrayOutputStream();
                 BukkitObjectOutputStream os = new BukkitObjectOutputStream(io);
 
-                os.write(items.size());
-                for (int a =0;a<items.size();a++){
-                    os.writeObject(items.get(a));
+                os.writeInt(items.size());
+
+                for (int i = 0; i < items.size(); i++){
+                    os.writeObject(items.get(i));
                 }
-                byte[] rawdata = io.toByteArray();
-                String encodedData = Base64.getEncoder().encodeToString(rawdata);
-                data.set(new NamespacedKey(Chapter46.getPlugin(),"vault"),PersistentDataType.STRING,encodedData);
+
+                os.flush();
+
+                byte[] rawData = io.toByteArray();
+
+                String encodedData = Base64.getEncoder().encodeToString(rawData);
+
+                data.set(new NamespacedKey(Chapter46.getPlugin(), "vault"), PersistentDataType.STRING, encodedData);
+
                 os.close();
-            }catch (IOException e){
-                System.out.println(e);
 
-            }
-        }
-    }
-    public static ArrayList<ItemStack> getItem(Player p){
-        PersistentDataContainer data = p.getPersistentDataContainer();
-        ArrayList<ItemStack> items = new ArrayList<>();
-        String encodedItem = data.get(new NamespacedKey(Chapter46.getPlugin(),"vault"),PersistentDataType.STRING);
-        if (!encodedItem.isEmpty()){
-            byte[] rawData = Base64.getDecoder().decode(encodedItem);
-
-            try {
-                ByteArrayInputStream io = new ByteArrayInputStream(rawData);
-                BukkitObjectInputStream in = new BukkitObjectInputStream(io);
-                int intcount = in.readInt();
-                for (int i =0;i<intcount;i++){
-                    items.add((ItemStack) in.readObject());
-                }
-                in.close();
-            }catch (IOException|ClassNotFoundException ex){
+            }catch (IOException ex){
                 System.out.println(ex);
             }
+
         }
 
+    }
 
+    public static ArrayList<ItemStack> getItems(Player p){
 
-    return items;}
+        PersistentDataContainer data = p.getPersistentDataContainer();
+
+        ArrayList<ItemStack> items = new ArrayList<>();
+
+        String encodedItems = data.get(new NamespacedKey(Chapter46.getPlugin(), "vault"), PersistentDataType.STRING);
+
+        if (!encodedItems.isEmpty()){
+
+            byte[] rawData = Base64.getDecoder().decode(encodedItems);
+
+            try{
+
+                ByteArrayInputStream io = new ByteArrayInputStream(rawData);
+                BukkitObjectInputStream in = new BukkitObjectInputStream(io);
+
+                int itemsCount = in.readInt();
+
+                for (int i = 0; i < itemsCount; i++){
+                    items.add((ItemStack) in.readObject());
+                }
+
+                in.close();
+
+            }catch (IOException | ClassNotFoundException ex){
+                System.out.println(ex);
+            }
+
+        }
+
+        return items;
+    }
+
 }
+

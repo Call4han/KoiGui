@@ -33,14 +33,16 @@ public class Listeners implements Listener {
         Player p = (Player) e.getPlayer();
         if (e.getView().getTitle().equalsIgnoreCase("Your Personal Vault")) {
             ArrayList<ItemStack> prudenitem = new ArrayList<>();
-            Arrays.stream(p.getInventory().getContents())
+            Arrays.stream(e.getInventory().getContents())
                     .filter(itemStack -> {
                         if (itemStack == null) {
                             return false;
                         }
                         return true;
-                    }).forEach(itemStack -> prudenitem.add(itemStack));
-            Vaultutils.storeItem(prudenitem, p);
+                    })
+                    .forEach(itemStack -> prudenitem.add(itemStack));
+            System.out.println("size: " + prudenitem.size());
+            Vaultutils.storeItems(prudenitem, p);
         }
 
     }}
